@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body, html{ height: 100%; margin: 0; }
+  #main { border: 1px solid red; height: 100%;}
+</style>
+</head>
+<body>
+<div id="main">
+  <output id="list"></output>
+  <div id="content">
+  
+  </div>
+</div>
+<script>
+  var main = document.getElementById('main');
+  main.addEventListener('drop', handleFileSelect, false);
+  main.addEventListener('dragover', handleDropOver, false);
+  function handleFileSelect(e){
+    e.stopPropagation();
+	e.preventDefault();
+	var files = e.dataTransfer.files;
+	var output = [];
+	
+	for (var i = 0, f; f = files[i]; i++) {
+      output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
+                  f.size, ' bytes, last modified: ',
+                  f.lastModifiedDate.toLocaleDateString(), '</li>');
+	  var reader = new FileReader();
+      reader.onloadend = function(evt) {
+	    if (evt.target.readyState === FileReader.DONE) {
+		  document.getElementById('content').textContent = evt.target.result;
+		}
+	  };
+	  var blob = f.slice(0, f.size);
+	  reader.readAsBinaryString(blob);
+    }
+	
+	
+    document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+	
+  }
+  function handleDropOver(e){
+    e.stopPropagation();
+	e.preventDefault();
+	e.dataTransfer.dropeffect = 'copy';
+  }
+</script>
+</body>
+</html>
